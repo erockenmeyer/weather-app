@@ -6,7 +6,7 @@ var todayEl = document.querySelector("#today");
 var forecastEl = document.querySelector("#forecast");
 
 // when city is searched, get the name and pass to get coordinates
-var searchSubmitHandler = function(event) {
+var searchSubmitHandler = function (event) {
     event.preventDefault();
 
     // get the city name from input
@@ -21,13 +21,13 @@ var searchSubmitHandler = function(event) {
 };
 
 // get city coordinates
-var getCityCoords = function(city) {
+var getCityCoords = function (city) {
     // format api url
     var apiUrl = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=87cbf5382a26348616956797afeee6f2"
-    
-    fetch(apiUrl).then(function(response) {
+
+    fetch(apiUrl).then(function (response) {
         if (response.ok) {
-            response.json().then(function(data) {
+            response.json().then(function (data) {
                 // put city name on html
                 var cityName = document.createElement("h2")
                 cityName.classList = "col-4"
@@ -43,18 +43,18 @@ var getCityCoords = function(city) {
             alert("Error: City not found.");
         }
     })
-    .catch(function(error) {
-        alert("Unable to connect.");
-    })
+        .catch(function (error) {
+            alert("Unable to connect.");
+        })
 }
 
 // using coords, get weather for that city
-var getCityWeather = function(lat, lon) {
+var getCityWeather = function (lat, lon) {
     var apiUrl = "https://api.openweathermap.org/data/2.5/onecall?lat=" + lat + "&lon=" + lon + "&units=imperial&exclude=minutely,hourly,alerts&appid=87cbf5382a26348616956797afeee6f2"
 
-    fetch(apiUrl).then(function(response) {
+    fetch(apiUrl).then(function (response) {
         if (response.ok) {
-            response.json().then(function(data) {
+            response.json().then(function (data) {
                 // send today's weather to be displayed
                 displayToday(data.current);
                 // send forecast to be displayed
@@ -64,14 +64,13 @@ var getCityWeather = function(lat, lon) {
             alert("Error: City not found.");
         }
     })
-    .catch(function(error) {
-        alert("Unable to connect.");
-    })
+        .catch(function (error) {
+            alert("Unable to connect.");
+        })
 }
 
 // display today's weather in the todayEl
-var displayToday = function(weather) {
-    console.log(weather);
+var displayToday = function (weather) {
     // element for date
     var dateEl = document.createElement("h2");
     dateEl.classList = "col-4 text-muted"
@@ -127,20 +126,57 @@ var displayToday = function(weather) {
 }
 
 // display the weather forecast in the forecastEl
-var displayForecast = function(weather) {
+var displayForecast = function (weather) {
     console.log(weather);
 
-    // loop through and display 5 days' forecast
+    // add forecast declaration
+    var forecast = document.createElement("h3");
+    forecast.textContent = "5 Day Forecast:"
+    forecast.className = "col-12";
+    forecastEl.appendChild(forecast);
+
+    // loop through and display 5 days' forecast as cards
     for (var i = 0; i < 5; i++) {
+        // create card
+        var castCardEl = document.createElement("div");
+        castCardEl.classList = "card col-12 col-md-auto";
+
+        // make ul to hold info
+        var cardInfo = document.createElement("ul");
+        cardInfo.classList = "list-group list-group-flush";
+
         // show date
+        var dateEl = document.createElement("li");
+        // date is in unix, convert to js date & pull only mm/dd/yyyy
+        var date = new Date(weather[i].dt * 1000).toLocaleDateString();
+        dateEl.textContent = date;
+        cardInfo.appendChild(dateEl);
 
         // show weather icon
+        var iconEl = document.createElement("li");
+        var iconNum = weather[i].weather[0].icon;
+        iconUrl = "http://openweathermap.org/img/wn/" + iconNum + ".png";
+        iconEl.innerHTML = "<img src=" + iconUrl + ">";
+        cardInfo.appendChild(iconEl);
 
         // show temperature
+        var tempEl = document.createElement("li");
+        tempEl.textContent = "Temp: " + weather[i].temp.max + " F";
+        cardInfo.appendChild(tempEl);
 
         // show windspeed
+        var windEl = document.createElement("li");
+        windEl.textContent = "Windspeed: " + weather[i].wind_speed + " mph";
+        cardInfo.appendChild(windEl);
 
         // show humidity
+        var humidEl = document.createElement("li");
+        humidEl.textContent = "Humidity: " + weather[i].humidity + "%";
+        cardInfo.appendChild(humidEl);
+
+        // append ul to card & card to body
+        castCardEl.appendChild(cardInfo);
+        forecastEl.appendChild(castCardEl);
     }
 }
 

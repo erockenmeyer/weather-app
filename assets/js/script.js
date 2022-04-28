@@ -5,9 +5,17 @@ var historyEl = document.querySelector("#history");
 var todayEl = document.querySelector("#today");
 var forecastEl = document.querySelector("#forecast");
 
+// history array to hold searches
+var searchHistory = [];
+
 // when city is searched, get the name and pass to get coordinates
 var searchSubmitHandler = function (event) {
     event.preventDefault();
+    
+    // clear any old content
+    historyEl.textContent = "";
+    todayEl.textContent = "";
+    forecastEl.textContent = "";
 
     // get the city name from input
     var city = cityEl.value.trim();
@@ -24,6 +32,8 @@ var searchSubmitHandler = function (event) {
 var getCityCoords = function (city) {
     // format api url
     var apiUrl = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=87cbf5382a26348616956797afeee6f2"
+    searchHistory.unshift(city);
+    saveSearches();
 
     fetch(apiUrl).then(function (response) {
         if (response.ok) {
@@ -127,8 +137,6 @@ var displayToday = function (weather) {
 
 // display the weather forecast in the forecastEl
 var displayForecast = function (weather) {
-    console.log(weather);
-
     // add forecast declaration
     var forecast = document.createElement("h3");
     forecast.textContent = "5 Day Forecast:"
@@ -177,6 +185,33 @@ var displayForecast = function (weather) {
         // append ul to card & card to body
         castCardEl.appendChild(cardInfo);
         forecastEl.appendChild(castCardEl);
+    }
+}
+
+// save searches to history
+var saveSearches = function() {
+    localStorage.setItem("cities", JSON.stringify(searchHistory));
+    loadHistory();
+}
+
+// show history
+var loadHistory = function() {
+    historyEl.textContent = "";
+    // retrieve from localstorage
+    var savedHistory = localStorage.getItem("cities");
+    if (!savedHistory) {
+        return false;
+    }
+    
+    // convert back to array
+    savedHistory = JSON.parse(savedHistory);
+
+    // display on page
+    for (var i = 0; i < savedHistory.length; i++) {
+        var oldSearchEl = document.createElement("div");
+        oldSearchEl.classList = "alert alert-secondary mt-1";
+        oldSearchEl.textContent = savedHistory[i];
+        historyEl.appendChild(oldSearchEl);
     }
 }
 

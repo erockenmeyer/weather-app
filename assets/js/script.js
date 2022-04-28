@@ -11,11 +11,6 @@ var searchHistory = [];
 // when city is searched, get the name and pass to get coordinates
 var searchSubmitHandler = function (event) {
     event.preventDefault();
-    
-    // clear any old content
-    historyEl.textContent = "";
-    todayEl.textContent = "";
-    forecastEl.textContent = "";
 
     // get the city name from input
     var city = cityEl.value.trim();
@@ -28,8 +23,15 @@ var searchSubmitHandler = function (event) {
     cityEl.value = "";
 };
 
+// if a city in the history is clicked, get its info
+var clickHandler = function (event) {
+    var city = event.target.getAttribute("city-name");
+    getCityCoords(city);
+}
+
 // get city coordinates
 var getCityCoords = function (city) {
+
     // format api url
     var apiUrl = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=87cbf5382a26348616956797afeee6f2"
     searchHistory.unshift(city);
@@ -189,20 +191,20 @@ var displayForecast = function (weather) {
 }
 
 // save searches to history
-var saveSearches = function() {
+var saveSearches = function () {
     localStorage.setItem("cities", JSON.stringify(searchHistory));
     loadHistory();
 }
 
 // show history
-var loadHistory = function() {
+var loadHistory = function () {
     historyEl.textContent = "";
     // retrieve from localstorage
     var savedHistory = localStorage.getItem("cities");
     if (!savedHistory) {
         return false;
     }
-    
+
     // convert back to array
     savedHistory = JSON.parse(savedHistory);
 
@@ -210,6 +212,7 @@ var loadHistory = function() {
     for (var i = 0; i < savedHistory.length; i++) {
         var oldSearchEl = document.createElement("div");
         oldSearchEl.classList = "alert alert-secondary mt-1";
+        oldSearchEl.setAttribute("city-name", savedHistory[i]);
         oldSearchEl.textContent = savedHistory[i];
         historyEl.appendChild(oldSearchEl);
     }
@@ -217,3 +220,6 @@ var loadHistory = function() {
 
 // listeners
 searchEl.addEventListener("submit", searchSubmitHandler);
+historyEl.addEventListener("click", clickHandler);
+
+loadHistory();

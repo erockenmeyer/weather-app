@@ -31,6 +31,10 @@ var clickHandler = function (event) {
 
 // get city coordinates
 var getCityCoords = function (city) {
+    // clear any old content
+    historyEl.textContent = "";
+    todayEl.textContent = "";
+    forecastEl.textContent = "";
 
     // format api url
     var apiUrl = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=87cbf5382a26348616956797afeee6f2"
